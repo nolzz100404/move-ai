@@ -1,0 +1,50 @@
+/* Custom Scrollbar & Utility Styles for ពិភព AI Movie */
+
+body {
+    background-color: #07090e;
+    color: #f8fafc;
+    overflow-x: hidden;
+    -webkit-tap-highlight-color: transparent;
+}
+
+/* Hide scrollbar for category horizontal scroll on mobile */
+.no-scrollbar::-webkit-scrollbar {
+    display: none;
+}
+.no-scrollbar {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+}
+
+/* Custom subtle dark scrollbar for desktop */
+::-webkit-scrollbar {
+    width: 8px;
+    height: 8px;
+}
+::-webkit-scrollbar-track {
+    background: #07090e;
+}
+::-webkit-scrollbar-thumb {
+    background: #212b40;
+    border-radius: 9999px;
+}
+::-webkit-scrollbar-thumb:hover {
+    background: #e11d48;
+}
+
+/* Cinematic hero vignette */
+.hero-vignette {
+    background: linear-gradient(to top, #07090e 5%, rgba(7, 9, 14, 0.7) 45%, rgba(7, 9, 14, 0.3) 100%),
+                linear-gradient(to right, #07090e 10%, rgba(7, 9, 14, 0.6) 50%, transparent 100%);
+}
+
+/* កែប្រអប់ Search និង Sort ឱ្យទៅជាពណ៌ខ្មៅងងឹតវិញ */
+#searchInput, #sortSelect {
+    background-color: #0d111a !important;
+    color: #ffffff !important;
+    border-color: rgba(255, 255, 255, 0.15) !important;
+}
+
+#searchInput::placeholder {
+    color: #94a3b8 !important;
+}

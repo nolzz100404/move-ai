@@ -1,0 +1,359 @@
+<!DOCTYPE html>
+<html lang="km" class="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ពិភព AI Movie - ពិភពភាពយន្តទំនើប</title>
+    
+    <link rel="icon" type="image/png" href="./jj.png">
+    <link rel="stylesheet" href="./style.css">
+    <script src="./script.js"></script>
+    
+    <!-- Google Fonts: Kantumruy Pro & Inter -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Kantumruy+Pro:ital,wght@0,300;0,400;0,500;0,600;0,700;1,400&display=swap" rel="stylesheet">
+    
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+
+    <script src="https://cdn.tailwindcss.com"></script>
+<script>
+    tailwind.config = {
+        darkMode: 'class',
+        theme: {
+            extend: {
+                fontFamily: { sans: ['"Kantumruy Pro"', 'Inter', 'sans-serif'] },
+                colors: {
+                    cinema: { 950: '#07090e', 900: '#0d111a', 800: '#161d2c', 700: '#212b40', accent: '#e11d48', accentHover: '#be123c', gold: '#f59e0b' }
+                }
+            }
+        }
+    };
+</script>
+    
+    <!-- Custom CSS File -->
+    <link rel="stylesheet" href="style.css">
+</head>
+<body class="antialiased selection:bg-cinema-accent selection:text-white">
+
+    <!-- ==================== NAVIGATION BAR ==================== -->
+    <header id="navbar" class="fixed top-0 inset-x-0 z-40 transition-all duration-300 bg-gradient-to-b from-cinema-950/90 to-transparent backdrop-blur-sm border-b border-white/5">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex items-center justify-between h-16 sm:h-20 gap-4">
+                
+                <!-- Brand Logo -->
+                <a href="#" onclick="resetFilters(event)" class="flex items-center gap-2.5 group shrink-0">
+                    <div class="w-10 h-10 rounded-xl bg-gradient-to-tr from-cinema-accent to-purple-600 flex items-center justify-center shadow-lg shadow-cinema-accent/30 group-hover:scale-105 transition-transform">
+                        <i class="fa-solid fa-film text-white text-lg"></i>
+                    </div>
+                    <div class="flex flex-col">
+                        <span class="text-lg sm:text-xl font-bold tracking-tight bg-gradient-to-r from-white via-slate-100 to-slate-300 bg-clip-text text-transparent">
+                            ពិភព <span class="text-cinema-accent">AI</span> Movie
+                        </span>
+                        <span class="text-[10px] text-slate-400 tracking-wider uppercase hidden sm:block">Next-Gen Cinema</span>
+                    </div>
+                </a>
+
+                <!-- Search Input -->
+                <div class="flex-1 max-w-md mx-2 sm:mx-6">
+                    <div class="relative group">
+                        <div class="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none">
+                            <i class="fa-solid fa-magnifying-glass text-slate-400 group-focus-within:text-cinema-accent transition-colors text-sm"></i>
+                        </div>
+                        <input 
+                            type="text" 
+                            id="searchInput" 
+                            placeholder="ស្វែងរកភាពយន្ត... (Search movies...)" 
+                            class="w-full bg-cinema-900/90 border border-white/10 text-sm text-white placeholder-slate-400 rounded-full pl-10 pr-9 py-2 sm:py-2.5 focus:outline-none focus:border-cinema-accent focus:ring-2 focus:ring-cinema-accent/20 transition-all"
+                        >
+                        <button 
+                            id="clearSearchBtn" 
+                            onclick="clearSearch()" 
+                            aria-label="Clear search"
+                            class="hidden absolute inset-y-0 right-0 pr-3 flex items-center text-slate-400 hover:text-white"
+                        >
+                            <i class="fa-solid fa-circle-xmark text-sm"></i>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Right Nav Actions -->
+                <div class="flex items-center gap-2 sm:gap-3 shrink-0">
+                    <button 
+                        onclick="toggleFavoritesFilter()" 
+                        id="navFavBtn"
+                        class="relative p-2.5 sm:px-4 sm:py-2 rounded-full bg-cinema-800/80 hover:bg-cinema-700 border border-white/10 text-slate-200 text-sm font-medium flex items-center gap-2 transition-all"
+                        title="បញ្ជីដែលចូលចិត្ត (My Watchlist)"
+                    >
+                        <i class="fa-solid fa-bookmark text-cinema-accent"></i>
+                        <span class="hidden md:inline">បញ្ជីទុកមើល</span>
+                        <span id="favCountBadge" class="bg-cinema-accent text-white text-[11px] font-bold px-1.5 py-0.2 rounded-full">0</span>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- ==================== HERO BANNER ==================== -->
+    <section id="heroSection" class="relative w-full min-h-[75vh] sm:min-h-[82vh] flex items-end pt-24 pb-12 sm:pb-16 overflow-hidden">
+        <div class="absolute inset-0 z-0">
+            <img 
+                id="heroBgImage"
+                src="https://images.unsplash.com/photo-1536440136628-849c177e76a1?auto=format&fit=crop&w=1920&q=80" 
+                onerror="this.onerror=null; this.src='https://placehold.co/1920x1080/0d111a/e11d48?text=ពិភព+AI+Movie';"
+                alt="Featured Movie Backdrop" 
+                class="w-full h-full object-cover object-center scale-105 transition-transform duration-1000"
+            >
+            <div class="absolute inset-0 hero-vignette"></div>
+        </div>
+
+        <div class="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 w-full">
+            <div class="max-w-2xl space-y-4 sm:space-y-5">
+                <div class="flex flex-wrap items-center gap-2.5">
+                    <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold bg-cinema-accent text-white shadow-lg shadow-cinema-accent/30">
+                        <i class="fa-solid fa-fire"></i> ភាពយន្តពិសេសប្រចាំសប្តាហ៍
+                    </span>
+                    <span id="heroCategory" class="px-3 py-1 rounded-full text-xs font-medium bg-white/10 backdrop-blur-md text-slate-200 border border-white/10">
+                        Sci-Fi • វិទ្យាសាស្ត្រ
+                    </span>
+                    <span class="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-bold bg-cinema-gold/20 text-cinema-gold border border-cinema-gold/30">
+                        <i class="fa-solid fa-star text-[10px]"></i> <span id="heroRating">9.2</span>
+                    </span>
+                </div>
+
+                <div>
+                    <h1 id="heroTitleKm" class="text-3xl sm:text-5xl lg:text-6xl font-extrabold text-white leading-tight tracking-tight">
+                        The AI Movie 2026
+                    </h1>
+                    <p id="heroTitleEn" class="text-base sm:text-xl font-medium text-slate-300 mt-1">
+                        Created by : Nolzz  (2026)
+                    </p>
+                </div>
+
+                <p id="heroDescription" class="text-sm sm:text-base text-slate-300 leading-relaxed line-clamp-3">
+                    Welcome to my website , hope you all enjoy watching movie AI🙏
+                </p>
+
+                <div class="flex items-center gap-4 text-xs sm:text-sm text-slate-400 pt-1">
+                    <span><i class="fa-regular fa-calendar mr-1.5 text-cinema-accent"></i><span id="heroYear">2026</span></span>
+                    <span>•</span>
+                    <span><i class="fa-regular fa-clock mr-1.5 text-cinema-accent"></i><span id="heroDuration">2h 18m</span></span>
+                    <span>•</span>
+                    <span class="px-2 py-0.5 rounded bg-white/10 text-white text-xs font-semibold">4K Ultra HD</span>
+                </div>
+
+                <div class="flex flex-wrap items-center gap-3 sm:gap-4 pt-2">
+                    <button 
+                        id="heroWatchBtn"
+                        onclick="openFeaturedMovie(true)"
+                        class="px-6 sm:px-8 py-3 sm:py-3.5 rounded-full bg-cinema-accent hover:bg-cinema-accentHover text-white font-semibold text-sm sm:text-base flex items-center gap-2.5 shadow-xl shadow-cinema-accent/30 hover:scale-105 active:scale-95 transition-all"
+                    >
+                        <i class="fa-solid fa-play"></i>
+                        <span>ទស្សនាឥឡូវនេះ (Watch Now)</span>
+                    </button>
+                    
+                    <button 
+                        id="heroDetailsBtn"
+                        onclick="openFeaturedMovie(false)"
+                        class="px-5 sm:px-6 py-3 sm:py-3.5 rounded-full bg-white/10 hover:bg-white/20 backdrop-blur-md border border-white/15 text-white font-medium text-sm sm:text-base flex items-center gap-2 transition-all"
+                    >
+                        <i class="fa-solid fa-circle-info"></i>
+                        <span>ព័ត៌មានលម្អិត</span>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ==================== MAIN CONTENT & FILTERS ==================== -->
+    <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pb-20 -mt-4 relative z-20">
+        <div class="flex flex-col lg:flex-row lg:items-start justify-between gap-4 pb-6 border-b border-white/10">
+            <div id="categoryContainer" class="flex flex-wrap items-center gap-2 py-1 flex-1"></div>
+
+            <div class="flex items-center justify-between md:justify-end gap-3 shrink-0">
+                <span id="movieCountText" class="text-xs sm:text-sm text-slate-400"></span>
+                <select 
+                    id="sortSelect" 
+                    onchange="applyFilters()"
+                    aria-label="Sort movies"
+                    class="bg-cinema-800 border border-white/10 text-slate-200 text-xs sm:text-sm rounded-xl px-3 py-2 focus:outline-none focus:border-cinema-accent cursor-pointer"
+                >
+                    <option value="featured">ពេញនិយម (Featured)</option>
+                    <option value="rating">ពិន្ទុខ្ពស់បំផុត (Top Rated)</option>
+                    <option value="newest">ឆ្នាំថ្មីបំផុត (Newest)</option>
+                </select>
+            </div>
+        </div>
+
+        <div id="moviesGrid" class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-4 gap-4 sm:gap-6 mt-8"></div>
+        
+        <div id="paginationContainer" class="flex flex-wrap items-center justify-center gap-2 mt-12"></div>
+
+        <div id="emptyState" class="hidden flex-col items-center justify-center py-20 text-center">
+            <div class="w-20 h-20 rounded-full bg-cinema-800/80 flex items-center justify-center mb-4 text-slate-500 text-3xl">
+                <i class="fa-solid fa-film"></i>
+            </div>
+            <h3 class="text-xl font-bold text-white mb-2">រកមិនឃើញភាពយន្តដែលអ្នកស្វែងរកទេ</h3>
+            <p class="text-slate-400 text-sm max-w-md mb-6">
+                សូមសាកល្បងស្វែងរកតាមចំណងជើងផ្សេង ឬជ្រើសរើសប្រភេទភាពយន្តទាំងអស់ឡើងវិញ។
+            </p>
+            <button 
+                onclick="resetFilters()" 
+                class="px-6 py-2.5 rounded-full bg-cinema-accent hover:bg-cinema-accentHover text-white text-sm font-semibold transition-all"
+            >
+                បង្ហាញភាពយន្តទាំងអស់ (Reset Filters)
+            </button>
+        </div>
+    </main>
+
+    <!-- ==================== FOOTER ==================== -->
+    <footer class="bg-cinema-900 border-t border-white/5 pt-12 pb-8">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex flex-col md:flex-row items-center justify-between gap-6 pb-8 border-b border-white/5">
+                <div class="flex items-center gap-3">
+                    <div class="w-9 h-9 rounded-xl bg-gradient-to-tr from-cinema-accent to-purple-600 flex items-center justify-center">
+                        <i class="fa-solid fa-film text-white text-sm"></i>
+                    </div>
+                    <span class="text-lg font-bold text-white">ពិភព <span class="text-cinema-accent">AI</span> Movie</span>
+                </div>
+                <p class="text-slate-400 text-xs sm:text-sm text-center md:text-right">
+                    គេហទំព័រទស្សនាភាពយន្តកម្រិតច្បាស់ 4K ជាមួយបច្ចេកវិទ្យា AI ទំនើបសម្រាប់អ្នកទស្សនាគ្រប់រូប។
+                </p>
+            </div>
+            <div class="flex flex-col sm:flex-row items-center justify-between gap-4 pt-6 text-xs text-slate-500">
+                <p>&copy; 2026 ពិភព AI Movie. រក្សាសិទ្ធិគ្រប់យ៉ាង (All Rights Reserved).</p>
+                <div class="flex items-center gap-4">
+                    <a href="#navbar" class="hover:text-slate-300 transition-colors">ទំព័រដើម</a>
+                    <span>•</span>
+                    <a href="#moviesGrid" class="hover:text-slate-300 transition-colors">ភាពយន្តថ្មីៗ</a>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <!-- ==================== MOVIE DETAILS & REAL VIDEO PLAYER MODAL ==================== -->
+    <div 
+        id="movieModal" 
+        class="fixed inset-0 z-50 hidden items-center justify-center p-3 sm:p-6 bg-black/85 backdrop-blur-md opacity-0 transition-opacity duration-300"
+        role="dialog"
+        aria-modal="true"
+    >
+        <div 
+            id="modalContent"
+            class="relative w-full max-w-4xl max-h-[92vh] overflow-y-auto bg-cinema-900 border border-white/15 rounded-2xl sm:rounded-3xl shadow-2xl transform scale-95 transition-transform duration-300"
+        >
+            <!-- Close Button -->
+            <button 
+                onclick="closeMovieModal()" 
+                aria-label="Close modal"
+                class="absolute top-3 right-3 sm:top-4 sm:right-4 z-30 w-10 h-10 rounded-full bg-black/60 hover:bg-cinema-accent text-white flex items-center justify-center backdrop-blur-md border border-white/15 transition-all"
+            >
+                <i class="fa-solid fa-xmark text-lg"></i>
+            </button>
+
+            <!-- Top Media Area -->
+            <div class="relative w-full aspect-video bg-black overflow-hidden">
+                <!-- 1. Preview Backdrop (មុនពេលចុច Play) -->
+                <div id="modalBackdropView" class="relative w-full h-full">
+                    <img 
+                        id="modalBackdropImg" 
+                        src="" 
+                        alt="Movie Scene" 
+                        class="w-full h-full object-cover opacity-80"
+                    >
+                    <div class="absolute inset-0 bg-gradient-to-t from-cinema-900 via-cinema-900/30 to-transparent"></div>
+                    
+                    <button 
+                        onclick="startRealPlayer()"
+                        class="absolute inset-0 m-auto w-16 h-16 sm:w-20 sm:h-20 rounded-full bg-cinema-accent/90 hover:bg-cinema-accent text-white flex items-center justify-center shadow-2xl shadow-cinema-accent/50 hover:scale-110 transition-all group"
+                    >
+                        <i class="fa-solid fa-play text-2xl sm:text-3xl ml-1 group-hover:scale-110 transition-transform"></i>
+                    </button>
+                    <span class="absolute bottom-4 left-4 sm:left-6 px-3 py-1 rounded-full bg-black/60 backdrop-blur-md text-xs text-slate-200 border border-white/10">
+                        <i class="fa-solid fa-play text-cinema-accent mr-1.5"></i>ចុចដើម្បីទស្សនាវីដេអូ (Watch Video)
+                    </span>
+                </div>
+
+                <!-- 2. Real Video Player (សម្រាប់ MP4 ឬ YouTube) -->
+                <div id="modalPlayerView" class="hidden relative w-full h-full bg-black flex-col justify-center items-center">
+                    <video id="realVideoPlayer" class="hidden w-full h-full object-contain" controls playsinline></video>
+                    <iframe id="youtubePlayer" class="hidden w-full h-full" frameborder="0" allow="autoplay; encrypted-media" allowfullscreen></iframe>
+                </div>
+            </div>
+
+            <!-- Movie Information Section -->
+            <div class="p-5 sm:p-8 space-y-6">
+                <div class="flex flex-col sm:flex-row sm:items-start justify-between gap-4">
+                    <div>
+                        <div class="flex flex-wrap items-center gap-2 mb-2">
+                            <span id="modalCategoryBadge" class="px-3 py-0.5 rounded-full text-xs font-semibold bg-cinema-accent/20 text-cinema-accent border border-cinema-accent/30">
+                                Action
+                            </span>
+                            <span id="modalYearBadge" class="text-xs text-slate-400 font-medium">2026</span>
+                            <span class="text-slate-600">•</span>
+                            <span id="modalDurationBadge" class="text-xs text-slate-400 font-medium">2h 15m</span>
+                            <span class="text-slate-600">•</span>
+                            <span class="inline-flex items-center gap-1 text-xs font-bold text-cinema-gold">
+                                <i class="fa-solid fa-star"></i> <span id="modalRatingBadge">8.9</span>/10
+                            </span>
+                        </div>
+                        <h2 id="modalTitleKm" class="text-2xl sm:text-3xl font-bold text-white">ចំណងជើងភាពយន្ត</h2>
+                        <p id="modalTitleEn" class="text-sm sm:text-base text-slate-400 mt-0.5">English Movie Title</p>
+                    </div>
+
+                    <div class="flex items-center gap-2.5 shrink-0">
+                        <button 
+                            id="modalFavBtn"
+                            onclick="toggleCurrentModalFavorite()"
+                            class="px-4 py-2.5 rounded-xl bg-cinema-800 hover:bg-cinema-700 border border-white/10 text-sm font-medium text-white flex items-center gap-2 transition-all"
+                        >
+                            <i class="fa-regular fa-bookmark"></i>
+                            <span>រក្សាទុក</span>
+                        </button>
+                        <button 
+                            onclick="shareMovie()"
+                            class="p-2.5 rounded-xl bg-cinema-800 hover:bg-cinema-700 border border-white/10 text-slate-200 transition-all"
+                            title="ចែករំលែក (Share)"
+                        >
+                            <i class="fa-solid fa-share-nodes"></i>
+                        </button>
+                    </div>
+                </div>
+
+                <div class="space-y-2">
+                    <h4 class="text-xs font-bold uppercase tracking-wider text-slate-400">សាច់រឿងសង្ខេប (Storyline)</h4>
+                    <p id="modalSynopsis" class="text-sm sm:text-base text-slate-300 leading-relaxed"></p>
+                </div>
+
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 pt-4 border-t border-white/10 text-sm">
+                    <div class="bg-cinema-800/50 p-3.5 rounded-xl border border-white/5">
+                        <span class="block text-xs text-slate-400 mb-1">អ្នកដឹកនាំរឿង (Director)</span>
+                        <span id="modalDirector" class="font-semibold text-white"></span>
+                    </div>
+                    <div class="bg-cinema-800/50 p-3.5 rounded-xl border border-white/5">
+                        <span class="block text-xs text-slate-400 mb-1">តួអង្គសំខាន់ៗ (Cast)</span>
+                        <span id="modalCast" class="font-semibold text-white"></span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ==================== TOAST NOTIFICATION ==================== -->
+    <div 
+        id="toastNotification" 
+        class="fixed bottom-5 right-5 z-50 transform translate-y-20 opacity-0 transition-all duration-300 pointer-events-none"
+    >
+        <div class="bg-cinema-800 border border-cinema-accent/40 text-white px-4 py-3 rounded-2xl shadow-2xl flex items-center gap-3 text-sm">
+            <i class="fa-solid fa-circle-check text-cinema-accent text-base"></i>
+            <span id="toastMessage">បានរក្សាទុកដោយជោគជ័យ!</span>
+        </div>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>

@@ -1,0 +1,169 @@
+<!DOCTYPE html>
+<html lang="km" class="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin - ពិភព AI Movie</title>
+    <link rel="icon" type="image/png" href="./jj.png">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&family=Kantumruy+Pro:wght@400;600;700&display=swap" rel="stylesheet">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    fontFamily: { sans: ['"Kantumruy Pro"', 'Inter', 'sans-serif'] },
+                    colors: { cinema: { 950: '#07090e', 900: '#0d111a', 800: '#161d2c', accent: '#e11d48' } }
+                }
+            }
+        };
+    </script>
+</head>
+<body class="bg-cinema-950 text-white min-h-screen p-6">
+    <div class="max-w-4xl mx-auto space-y-8">
+        <div class="flex items-center justify-between border-b border-white/10 pb-4">
+            <h1 class="text-2xl font-bold">🎬 គ្រប់គ្រងភាពយន្ត (Admin Panel)</h1>
+            <a href="/" class="px-4 py-2 rounded-xl bg-cinema-800 hover:bg-cinema-accent text-sm font-medium transition">← ទៅកាន់គេហទំព័រ</a>
+        </div>
+
+        <!-- Upload Form -->
+        <form id="uploadForm" class="bg-cinema-900 p-6 rounded-2xl border border-white/10 space-y-4">
+            <h2 class="text-lg font-bold text-cinema-accent">បន្ថែមភាពយន្តថ្មី (Upload Movie)</h2>
+            
+            <div>
+                <label class="block text-xs text-slate-400 mb-1">លេខសម្ងាត់ Admin (Password)</label>
+                <input type="password" id="adminPass" value="nolzz2026" required class="w-full bg-cinema-800 border border-white/10 rounded-xl px-3.5 py-2 text-sm">
+            </div>
+
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <div>
+                    <label class="block text-xs text-slate-400 mb-1">ចំណងជើងខ្មែរ (Khmer Title)</label>
+                    <input type="text" name="titleKm" required class="w-full bg-cinema-800 border border-white/10 rounded-xl px-3.5 py-2 text-sm">
+                </div>
+                <div>
+                    <label class="block text-xs text-slate-400 mb-1">ចំណងជើងអង់គ្លេស (English Title)</label>
+                    <input type="text" name="titleEn" required class="w-full bg-cinema-800 border border-white/10 rounded-xl px-3.5 py-2 text-sm">
+                </div>
+            </div>
+
+            <div class="grid grid-cols-2 sm:grid-cols-4 gap-4">
+                <div>
+                    <label class="block text-xs text-slate-400 mb-1">ប្រភេទ (Category)</label>
+                    <select name="category" class="w-full bg-cinema-800 border border-white/10 rounded-xl px-3 py-2 text-sm">
+                        <option value="Drama">Drama (មនោសញ្ចេតនា)</option>
+                        <option value="Ancient">Ancient (ភាពយន្តបុរាណ)</option>
+                        <option value="Action">Action (វាយប្រហារ)</option>
+                        <option value="Sci-Fi">Sci-Fi (វិទ្យាសាស្ត្រ)</option>
+                        <option value="Animation">Animation (គំនូរជីវចល)</option>
+                        <option value="Khmer">Khmer (ភាពយន្តខ្មែរ)</option>
+                        <option value="Horror">Horror (ភាពយន្តភ័យរន្ធត់)</option>
+                    </select>
+                </div>
+                <div>
+                    <label class="block text-xs text-slate-400 mb-1">រយៈពេល (Duration)</label>
+                    <input type="text" name="duration" placeholder="1h 30m" value="1h 30m" class="w-full bg-cinema-800 border border-white/10 rounded-xl px-3 py-2 text-sm">
+                </div>
+                <div>
+                    <label class="block text-xs text-slate-400 mb-1">ពិន្ទុ (Rating)</label>
+                    <input type="number" step="0.1" name="rating" value="9.0" class="w-full bg-cinema-800 border border-white/10 rounded-xl px-3 py-2 text-sm">
+                </div>
+                <div>
+                    <label class="block text-xs text-slate-400 mb-1">ឆ្នាំ (Year)</label>
+                    <input type="number" name="year" value="2026" class="w-full bg-cinema-800 border border-white/10 rounded-xl px-3 py-2 text-sm">
+                </div>
+            </div>
+
+            <div>
+                <label class="block text-xs text-slate-400 mb-1">តួអង្គសំខាន់ៗ (Cast)</label>
+                <input type="text" name="cast" placeholder="តួប្រុស , តួស្រី" class="w-full bg-cinema-800 border border-white/10 rounded-xl px-3.5 py-2 text-sm">
+            </div>
+
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <div>
+                    <label class="block text-xs text-slate-400 mb-1">រូបភាព Poster (Upload Image)</label>
+                    <input type="file" name="poster" accept="image/*" class="w-full bg-cinema-800 border border-white/10 rounded-xl px-3 py-1.5 text-xs">
+                </div>
+                <div>
+                    <label class="block text-xs text-slate-400 mb-1">ឯកសារវីដេអូ MP4 (Upload Video)</label>
+                    <input type="file" name="video" accept="video/mp4,video/*" class="w-full bg-cinema-800 border border-white/10 rounded-xl px-3 py-1.5 text-xs">
+                </div>
+            </div>
+
+            <div>
+                <label class="block text-xs text-slate-400 mb-1">ឬដាក់តំណភ្ជាប់ YouTube Embed (ប្រសិនបើមិន Upload MP4)</label>
+                <input type="text" name="videoUrl" placeholder="https://www.youtube.com/embed/..." class="w-full bg-cinema-800 border border-white/10 rounded-xl px-3.5 py-2 text-sm">
+            </div>
+
+            <button type="submit" id="submitBtn" class="w-full py-3 rounded-xl bg-cinema-accent hover:bg-rose-700 font-bold text-sm transition">
+                + បង្ហោះភាពយន្ត (Upload Movie)
+            </button>
+        </form>
+
+        <!-- Existing Movies List -->
+        <div class="bg-cinema-900 p-6 rounded-2xl border border-white/10 space-y-4">
+            <h2 class="text-lg font-bold">បញ្ជីភាពយន្តដែលមានស្រាប់</h2>
+            <div id="adminMoviesList" class="space-y-2"></div>
+        </div>
+    </div>
+
+    <script>
+        async function loadAdminMovies() {
+            const res = await fetch('/api/movies');
+            const movies = await res.json();
+            document.getElementById('adminMoviesList').innerHTML = movies.map(m => `
+                <div class="flex items-center justify-between bg-cinema-800 p-3 rounded-xl">
+                    <div class="flex items-center gap-3">
+                        <img src="${m.poster}" class="w-10 h-14 object-cover rounded-lg">
+                        <div>
+                            <div class="font-bold text-sm">${m.titleKm}</div>
+                            <div class="text-xs text-slate-400">${m.titleEn} • ${m.category} • ⭐ ${m.rating}</div>
+                        </div>
+                    </div>
+                    <button onclick="deleteMovie(${m.id})" class="px-3 py-1.5 rounded-lg bg-red-600/20 text-red-400 hover:bg-red-600 hover:text-white text-xs font-bold transition">លុប</button>
+                </div>
+            `).join('');
+        }
+
+        document.getElementById('uploadForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const btn = document.getElementById('submitBtn');
+            btn.disabled = true;
+            btn.textContent = 'កំពុង Upload... សូមរង់ចាំ...';
+
+            const formData = new FormData(e.target);
+            const pass = document.getElementById('adminPass').value;
+
+            const res = await fetch('/api/movies', {
+                method: 'POST',
+                headers: { 'x-admin-password': pass },
+                body: formData
+            });
+
+            btn.disabled = false;
+            btn.textContent = '+ បង្ហោះភាពយន្ត (Upload Movie)';
+
+            if (res.ok) {
+                alert('បង្ហោះភាពយន្តបានជោគជ័យ!');
+                e.target.reset();
+                loadAdminMovies();
+            } else {
+                const err = await res.json();
+                alert(err.error || 'មានបញ្ហាក្នុងការបង្ហោះ!');
+            }
+        });
+
+        async function deleteMovie(id) {
+            if (!confirm('តើអ្នកពិតជាចង់លុបភាពយន្តនេះមែនទេ?')) return;
+            const pass = document.getElementById('adminPass').value;
+            const res = await fetch(`/api/movies/${id}`, {
+                method: 'DELETE',
+                headers: { 'x-admin-password': pass }
+            });
+            if (res.ok) loadAdminMovies();
+            else alert('លេខសម្ងាត់មិនត្រឹមត្រូវ!');
+        }
+
+        loadAdminMovies();
+    </script>
+</body>
+</html>
