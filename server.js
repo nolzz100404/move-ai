@@ -7,17 +7,23 @@ const path = require('path');
 const app = express();
 const PORT = process.env.PORT || 3000;
 const ADMIN_PASSWORD = process.env.ADMIN_PASSWORD || 'nolzz2026'; // Change this password!
+const IS_VERCEL = Boolean(process.env.VERCEL);
 
 // Directories & Database File
 const PUBLIC_DIR = path.join(__dirname, 'public');
 const MEDIA_DIR = path.join(__dirname, 'Video and Img');
-const DB_FILE = path.join(__dirname, 'movies.json');
+const WRITABLE_MEDIA_DIR = IS_VERCEL ? '/tmp/media' : MEDIA_DIR;
+const DB_FILE = IS_VERCEL ? '/tmp/movies.json' : path.join(__dirname, 'movies.json');
 
-// Ensure directories exist
-if (!fs.existsSync(PUBLIC_DIR)) fs.mkdirSync(PUBLIC_DIR, { recursive: true });
-if (!fs.existsSync(MEDIA_DIR)) fs.mkdirSync(MEDIA_DIR, { recursive: true });
+// Ensure writable directories exist (Safe for Vercel)
+try {
+    if (!IS_VERCEL && !fs.existsSync(PUBLIC_DIR)) fs.mkdirSync(PUBLIC_DIR, { recursive: true });
+    if (!fs.existsSync(WRITABLE_MEDIA_DIR)) fs.mkdirSync(WRITABLE_MEDIA_DIR, { recursive: true });
+} catch (err) {
+    console.warn('Directory init warning:', err.message);
+}
 
-// Initial seed data (migrated from your frontend)
+// Initial seed data
 const INITIAL_MOVIES = [
     { id: 1, titleKm: "គេសង្ស័យខ្ញុំទាក់ទងជាមួយគ្រូបន្ទុកថ្នាក់ តាមពិតគាត់ជាឪពុករបស់ខ្ញុំសោះ", titleEn: "Dad's Teacher", category: "Drama", year: 2026, rating: 9.1, duration: "1h 08m", featured: true, poster: "/media/Img1.jpg", backdrop: "/media/Img1.jpg", video: "/media/V1.mp4", director: "Nolzz", cast: "ស៊ីវ៉ាន , លោកគ្រូចូវ", synopsis: "សាច់រឿងសង្ខេបនៃរឿង Dad's Teacher..." },
     { id: 2, titleKm: "អ្នកជិតខាងចិញ្ចឹមជ្រូក40ក្បាល ធ្វើអោយអ្នកភូមិស្អុយលាមក", titleEn: "The Bad Neighbor", category: "Drama", year: 2026, rating: 9.3, duration: "0h 50m", featured: false, poster: "/media/Img2.jpg", backdrop: "/media/Img2.jpg", video: "/media/V2.mp4", director: "Nolzz", cast: "តួរអង្គប្រុសក្មេង , អុីអ្នកជិតខាងអាក្រក់", synopsis: "សាច់រឿងសង្ខេបនៃរឿង The Bad Neighbor..." },
@@ -34,11 +40,21 @@ const INITIAL_MOVIES = [
 
 // Helper functions to read/write JSON database
 function readMovies() {
-    if (!fs.existsSync(DB_FILE)) {
+    try {
+        if (fs.existsSync(DB_FILE)) {
+            return JSON.parse(fs.readFileSync(DB_FILE, 'utf8'));
+        }
+        const bundledDb = path.join(__dirname, 'movies.json');
+        if (fs.existsSync(bundledDb)) {
+            const data = JSON.parse(fs.readFileSync(bundledDb, 'utf8'));
+            fs.writeFileSync(DB_FILE, JSON.stringify(data, null, 2), 'utf8');
+            return data;
+        }
         fs.writeFileSync(DB_FILE, JSON.stringify(INITIAL_MOVIES, null, 2), 'utf8');
         return INITIAL_MOVIES;
+    } catch (err) {
+        return INITIAL_MOVIES;
     }
-    return JSON.parse(fs.readFileSync(DB_FILE, 'utf8'));
 }
 
 function writeMovies(movies) {
@@ -49,12 +65,22 @@ function writeMovies(movies) {
 app.use(cors());
 app.use(express.json());
 app.use(express.static(PUBLIC_DIR));
+app.use('/media', express.static(WRITABLE_MEDIA_DIR));
 app.use('/media', express.static(MEDIA_DIR));
-app.use('/Video and Img', express.static(MEDIA_DIR)); // Keeps backward compatibility with your old paths
+app.use('/Video and Img', express.static(MEDIA_DIR));
+
+// Explicitly serve index.html and Admin.html
+app.get('/', (req, res) => {
+    res.sendFile(path.join(PUBLIC_DIR, 'index.html'));
+});
+
+app.get(['/admin.html', '/Admin.html'], (req, res) => {
+    res.sendFile(path.join(PUBLIC_DIR, 'Admin.html'));
+});
 
 // Multer setup for uploading posters and videos
 const storage = multer.diskStorage({
-    destination: (req, file, cb) => cb(null, MEDIA_DIR),
+    destination: (req, file, cb) => cb(null, WRITABLE_MEDIA_DIR),
     filename: (req, file, cb) => {
         const ext = path.extname(file.originalname);
         const prefix = file.fieldname === 'poster' ? 'Img_' : 'V_';
@@ -109,7 +135,7 @@ app.get('/api/movies/:id', (req, res) => {
     res.json(movie);
 });
 
-// 3. POST new movie (Admin Upload: supports file upload OR YouTube/external URL)
+// 3. POST new movie
 app.post(
     '/api/movies',
     requireAdmin,
@@ -148,13 +174,13 @@ app.post(
             synopsis: req.body.synopsis || `សាច់រឿងសង្ខេបនៃរឿង ${req.body.titleEn || ''}...`
         };
 
-        movies.unshift(newMovie); // Add newest movie to the top
+        movies.unshift(newMovie);
         writeMovies(movies);
         res.status(201).json(newMovie);
     }
 );
 
-// 4. DELETE a movie (Admin)
+// 4. DELETE a movie
 app.delete('/api/movies/:id', requireAdmin, (req, res) => {
     let movies = readMovies();
     const index = movies.findIndex(m => m.id === Number(req.params.id));
@@ -165,12 +191,16 @@ app.delete('/api/movies/:id', requireAdmin, (req, res) => {
     res.json({ message: 'បានលុបភាពយន្តដោយជោគជ័យ', deleted });
 });
 
-// Start Server
-app.listen(PORT, () => {
-    console.log(`=================================================`);
-    console.log(`🎬 ពិភព AI Movie Server is running!`);
-    console.log(`🌐 Website:     http://localhost:${PORT}`);
-    console.log(`🛠️  Admin Panel: http://localhost:${PORT}/admin.html`);
-    console.log(`🔑 Admin Pass:  ${ADMIN_PASSWORD}`);
-    console.log(`=================================================`);
-});
+// Start Server locally, export app for Vercel
+if (require.main === module) {
+    app.listen(PORT, () => {
+        console.log(`=================================================`);
+        console.log(`🎬 ពិភព AI Movie Server is running!`);
+        console.log(`🌐 Website:     http://localhost:${PORT}`);
+        console.log(`🛠️  Admin Panel: http://localhost:${PORT}/Admin.html`);
+        console.log(`🔑 Admin Pass:  ${ADMIN_PASSWORD}`);
+        console.log(`=================================================`);
+    });
+}
+
+module.exports = app;
