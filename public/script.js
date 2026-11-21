@@ -490,10 +490,25 @@ function startRealPlayer() {
         videoEl.pause();
         videoEl.src = '';
         ytEl.classList.remove('hidden');
-        ytEl.src = formatVideoEmbedUrl(rawVideoUrl);
+        const embedUrl = formatVideoEmbedUrl(rawVideoUrl);
+        ytEl.src = embedUrl;
+
+        let extBtn = document.getElementById('externalDriveBtn');
+        if (!extBtn) {
+            extBtn = document.createElement('a');
+            extBtn.id = 'externalDriveBtn';
+            extBtn.target = '_blank';
+            extBtn.className = 'mt-3 inline-flex items-center justify-center gap-2 px-4 py-2 rounded-xl bg-cinema-accent hover:bg-rose-700 text-white text-xs font-bold shadow-lg transition-all';
+            extBtn.innerHTML = '<i class="fa-solid fa-up-right-from-square"></i> បើកមើលពេញអេក្រង់ (បើវីដេអូងងឹតលើទូរស័ព្ទ)';
+            playerView.appendChild(extBtn);
+        }
+        extBtn.href = embedUrl;
+        extBtn.classList.toggle('hidden', !rawVideoUrl.includes('drive.google.com'));
     } else {
         ytEl.classList.add('hidden');
         ytEl.src = '';
+        const extBtn = document.getElementById('externalDriveBtn');
+        if (extBtn) extBtn.classList.add('hidden');
         videoEl.classList.remove('hidden');
         videoEl.src = rawVideoUrl;
         videoEl.play();
@@ -503,8 +518,10 @@ function startRealPlayer() {
 function stopRealPlayer() {
     const videoEl = document.getElementById('realVideoPlayer');
     const ytEl = document.getElementById('youtubePlayer');
+    const extBtn = document.getElementById('externalDriveBtn');
     if (videoEl) { videoEl.pause(); videoEl.src = ''; }
     if (ytEl) { ytEl.src = ''; }
+    if (extBtn) { extBtn.classList.add('hidden'); }
     const playerView = document.getElementById('modalPlayerView');
     if (playerView) { playerView.classList.add('hidden'); playerView.classList.remove('flex'); }
     const backdropView = document.getElementById('modalBackdropView');
