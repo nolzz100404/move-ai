@@ -48,3 +48,28 @@ body {
 #searchInput::placeholder {
     color: #94a3b8 !important;
 }
+
+/* ជួសជុលបញ្ហាវីដេអូ iframe ភ្លឹបភ្លែត ងងឹតម្តងភ្លឺម្តង នៅលើទូរស័ព្ទ */
+#modalPlayerView {
+    background-color: #000000 !important;
+    isolation: isolate;
+}
+
+#youtubePlayer,
+#realVideoPlayer {
+    background-color: #000000 !important;
+    transform: translateZ(0);
+    -webkit-transform: translateZ(0);
+    backface-visibility: hidden;
+    -webkit-backface-visibility: hidden;
+    will-change: transform;
+}
+
+/* បិទ backdrop-blur លើទូរស័ព្ទពេលបើក Modal ដើម្បីកុំឱ្យកុងជាមួយ Video Player */
+@media (max-width: 768px) {
+    #movieModal {
+        backdrop-filter: none !important;
+        -webkit-backdrop-filter: none !important;
+        background-color: rgba(0, 0, 0, 0.95) !important;
+    }
+}
