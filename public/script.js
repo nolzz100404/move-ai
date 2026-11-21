@@ -32,6 +32,41 @@ let state = {
     itemsPerPage: 8
 };
 
+// មុខងារបំប្លែង Link Google Drive និង YouTube ដោយស្វ័យប្រវត្តិ
+function extractGoogleDriveId(url) {
+    if (!url || !url.includes('drive.google.com')) return null;
+    const match = url.match(/\/d\/([a-zA-Z0-9_-]+)/) || url.match(/[?&]id=([a-zA-Z0-9_-]+)/);
+    return match ? match[1] : null;
+}
+
+function formatPosterUrl(url) {
+    const driveId = extractGoogleDriveId(url);
+    if (driveId) {
+        return `https://lh3.googleusercontent.com/d/${driveId}`;
+    }
+    return url;
+}
+
+function formatVideoEmbedUrl(url) {
+    if (!url) return '';
+    // បំប្លែង Link Google Drive ទៅជា /preview
+    const driveId = extractGoogleDriveId(url);
+    if (driveId) {
+        return `https://drive.google.com/file/d/${driveId}/preview`;
+    }
+    // បំប្លែង Link YouTube ធម្មតា ទៅជា /embed/
+    if (url.includes('youtube.com/watch')) {
+        const vid = new URL(url).searchParams.get('v');
+        if (vid) return `https://www.youtube.com/embed/${vid}?autoplay=1`;
+    } else if (url.includes('youtu.be/')) {
+        const vid = url.split('youtu.be/')[1]?.split(/[?&]/)[0];
+        if (vid) return `https://www.youtube.com/embed/${vid}?autoplay=1`;
+    } else if (url.includes('youtube.com/embed/')) {
+        return url.includes('?') ? `${url}&autoplay=1` : `${url}?autoplay=1`;
+    }
+    return url;
+}
+
 document.addEventListener('DOMContentLoaded', async () => {
     renderCategories();
     updateFavoriteBadge();
@@ -45,6 +80,8 @@ async function loadMoviesFromBackend() {
         const data = await res.json();
         MOVIES_DATA = data.map(m => ({
             ...m,
+            poster: formatPosterUrl(m.poster),
+            backdrop: formatPosterUrl(m.backdrop || m.poster),
             categoryKm: CAT_MAP[m.category] || m.category
         }));
         applyFilters();
@@ -430,8 +467,8 @@ function closeMovieModal() {
 
 function startRealPlayer() {
     if (!state.activeMovie) return;
-    const videoUrl = state.activeMovie.video;
-    if (!videoUrl) {
+    const rawVideoUrl = state.activeMovie.video;
+    if (!rawVideoUrl) {
         showToast('មិនទាន់មានវីដេអូសម្រាប់រឿងនេះទេ!');
         return;
     }
@@ -444,16 +481,21 @@ function startRealPlayer() {
     const videoEl = document.getElementById('realVideoPlayer');
     const ytEl = document.getElementById('youtubePlayer');
 
-    if (videoUrl.includes('youtube.com') || videoUrl.includes('youtu.be')) {
+    const isIframeEmbed = rawVideoUrl.includes('youtube.com') || 
+                          rawVideoUrl.includes('youtu.be') || 
+                          rawVideoUrl.includes('drive.google.com');
+
+    if (isIframeEmbed) {
         videoEl.classList.add('hidden');
         videoEl.pause();
+        videoEl.src = '';
         ytEl.classList.remove('hidden');
-        ytEl.src = videoUrl.includes('?') ? `${videoUrl}&autoplay=1` : `${videoUrl}?autoplay=1`;
+        ytEl.src = formatVideoEmbedUrl(rawVideoUrl);
     } else {
         ytEl.classList.add('hidden');
         ytEl.src = '';
         videoEl.classList.remove('hidden');
-        videoEl.src = videoUrl;
+        videoEl.src = rawVideoUrl;
         videoEl.play();
     }
 }
