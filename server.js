@@ -25,7 +25,7 @@ try {
 
 // Initial seed data
 const INITIAL_MOVIES = [
-    { id: 1, titleKm: "គេសង្ស័យខ្ញុំទាក់ទងជាមួយគ្រូបន្ទុកថ្នាក់ តាមពិតគាត់ជាឪពុករបស់ខ្ញុំសោះ", titleEn: "Dad's Teacher", category: "Drama", year: 2026, rating: 9.1, duration: "1h 08m", featured: true, poster: "/media/Img1.jpg", backdrop: "/media/Img1.jpg", video: "/media/V1.mp4", director: "Nolzz", cast: "ស៊ីវ៉ាន , លោកគ្រូចូវ", synopsis: "សាច់រឿងសង្ខេបនៃរឿង Dad's Teacher..." },
+    { id: 1, titleKm: "គេសង្ស័យខ្ញុំទាក់ទងជាមួយគ្រូបន្ទុកថ្នាក់ តាមពិតគាត់ជាឪពុករបស់ខ្ញុំសោះ", titleEn: "Dad's Teacher", category: "Drama", year: 2026, rating: 9.1, duration: "1h 08m", featured: true, poster: "/media/Img1.jpg", backdrop: "/media/Img1.jpg", video: "https://drive.google.com/drive/quota?dmr=1&ec=wgc-drive-%5Bmodule%5D-goto", director: "Nolzz", cast: "ស៊ីវ៉ាន , លោកគ្រូចូវ", synopsis: "សាច់រឿងសង្ខេបនៃរឿង Dad's Teacher..." },
     { id: 2, titleKm: "អ្នកជិតខាងចិញ្ចឹមជ្រូក40ក្បាល ធ្វើអោយអ្នកភូមិស្អុយលាមក", titleEn: "The Bad Neighbor", category: "Drama", year: 2026, rating: 9.3, duration: "0h 50m", featured: false, poster: "/media/Img2.jpg", backdrop: "/media/Img2.jpg", video: "/media/V2.mp4", director: "Nolzz", cast: "តួរអង្គប្រុសក្មេង , អុីអ្នកជិតខាងអាក្រក់", synopsis: "សាច់រឿងសង្ខេបនៃរឿង The Bad Neighbor..." },
     { id: 3, titleKm: "អ្នកជិតខាង ចិត្តអាក្រក់ទាំងគ្រួសារ", titleEn: "The Bad Family Neighbor", category: "Drama", year: 2026, rating: 9.0, duration: "0h 58m", featured: false, poster: "/media/Img3.jpg", backdrop: "/media/Img3.jpg", video: "/media/V3.mp4", director: "Nolzz", cast: "តួរអង្គក្មេងស្រី , គ្រួសារអ្នកជិតខាងអាក្រក់", synopsis: "សាច់រឿងសង្ខេបនៃរឿង The Bad Family Neighbor..." },
     { id: 4, titleKm: "កំពូលកូនស្រីនាំសំណាង", titleEn: "The Lucky daughter", category: "Ancient", year: 2026, rating: 9.3, duration: "2h 14m", featured: false, poster: "/media/Img4.png", backdrop: "/media/Img4.png", video: "/media/V4.mp4", director: "Nolzz", cast: "តួរអង្គលីន សៀវប៉ាវ", synopsis: "សាច់រឿងសង្ខេបនៃរឿង The Lucky daughter..." },
@@ -44,7 +44,7 @@ function readMovies() {
         if (fs.existsSync(DB_FILE)) {
             return JSON.parse(fs.readFileSync(DB_FILE, 'utf8'));
         }
-        const bundledDb = path.join(__dirname, 'movies.json');
+        const bundledDb = path.join(__dirname, 'movies.json');                                                                                                                                                                                                                                    
         if (fs.existsSync(bundledDb)) {
             const data = JSON.parse(fs.readFileSync(bundledDb, 'utf8'));
             fs.writeFileSync(DB_FILE, JSON.stringify(data, null, 2), 'utf8');
