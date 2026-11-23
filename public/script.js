@@ -65,6 +65,13 @@ function formatVideoEmbedUrl(url) {
         return url.includes('?') ? `${url}&autoplay=1` : `${url}?autoplay=1`;
     }
     return url;
+    // ថែមកូដនេះ៖ បំប្លែង Link Ok.ru ទៅជា /videoembed/
+    if (url.includes('ok.ru/video/')) {
+        const vid = url.split('ok.ru/video/')[1]?.split(/[?&/]/)[0];
+        if (vid) return `https://ok.ru/videoembed/${vid}?autoplay=1`;
+    } else if (url.includes('ok.ru/videoembed/')) {
+        return url.includes('?') ? `${url}&autoplay=1` : `${url}?autoplay=1`;
+    }
 }
 
 document.addEventListener('DOMContentLoaded', async () => {
