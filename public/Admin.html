@@ -32,16 +32,16 @@
             
             <div>
                 <label class="block text-xs text-slate-400 mb-1">លេខសម្ងាត់ Admin (Password)</label>
-                <input type="password" id="adminPass" value="nolzz2026" required class="w-full bg-cinema-800 border border-white/10 rounded-xl px-3.5 py-2 text-sm">
+                <input type="password" id="adminPass" placeholder="បញ្ចូលលេខសម្ងាត់..." required class="w-full bg-cinema-800 border border-white/10 rounded-xl px-3.5 py-2 text-sm">
             </div>
 
             <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div>
-                    <label class="block text-xs text-slate-400 mb-1">ចំណងជើងខ្មែរ (Khmer Title)</label>
+                    <label class="block text-xs text-slate-400 mb-1">ចំណងជើងខ្មែរ (Khmer Title) *</label>
                     <input type="text" name="titleKm" required class="w-full bg-cinema-800 border border-white/10 rounded-xl px-3.5 py-2 text-sm">
                 </div>
                 <div>
-                    <label class="block text-xs text-slate-400 mb-1">ចំណងជើងអង់គ្លេស (English Title)</label>
+                    <label class="block text-xs text-slate-400 mb-1">ចំណងជើងអង់គ្លេស (English Title) *</label>
                     <input type="text" name="titleEn" required class="w-full bg-cinema-800 border border-white/10 rounded-xl px-3.5 py-2 text-sm">
                 </div>
             </div>
@@ -73,25 +73,26 @@
                 </div>
             </div>
 
-            <div>
-                <label class="block text-xs text-slate-400 mb-1">តួអង្គសំខាន់ៗ (Cast)</label>
-                <input type="text" name="cast" placeholder="តួប្រុស , តួស្រី" class="w-full bg-cinema-800 border border-white/10 rounded-xl px-3.5 py-2 text-sm">
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <div>
+                    <label class="block text-xs text-slate-400 mb-1">តួអង្គសំខាន់ៗ (Cast)</label>
+                    <input type="text" name="cast" placeholder="តួប្រុស , តួស្រី" value="Nolzz" class="w-full bg-cinema-800 border border-white/10 rounded-xl px-3.5 py-2 text-sm">
+                </div>
+                <div>
+                    <label class="block text-xs text-slate-400 mb-1">សាច់រឿងសង្ខេប (Synopsis)</label>
+                    <input type="text" name="synopsis" placeholder="សាច់រឿងសង្ខេប..." class="w-full bg-cinema-800 border border-white/10 rounded-xl px-3.5 py-2 text-sm">
+                </div>
             </div>
 
             <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div>
-                    <label class="block text-xs text-slate-400 mb-1">រូបភាព Poster (Upload Image)</label>
-                    <input type="file" name="poster" accept="image/*" class="w-full bg-cinema-800 border border-white/10 rounded-xl px-3 py-1.5 text-xs">
+                    <label class="block text-xs text-slate-400 mb-1">Link រូបភាព Poster (Google Drive Link) *</label>
+                    <input type="url" name="posterUrl" required placeholder="https://drive.google.com/file/d/..." class="w-full bg-cinema-800 border border-white/10 rounded-xl px-3.5 py-2 text-sm">
                 </div>
                 <div>
-                    <label class="block text-xs text-slate-400 mb-1">ឯកសារវីដេអូ MP4 (Upload Video)</label>
-                    <input type="file" name="video" accept="video/mp4,video/*" class="w-full bg-cinema-800 border border-white/10 rounded-xl px-3 py-1.5 text-xs">
+                    <label class="block text-xs text-slate-400 mb-1">Link វីដេអូរឿង (Ok.ru / YouTube / Google Drive) *</label>
+                    <input type="url" name="videoUrl" required placeholder="https://ok.ru/video/..." class="w-full bg-cinema-800 border border-white/10 rounded-xl px-3.5 py-2 text-sm">
                 </div>
-            </div>
-
-            <div>
-                <label class="block text-xs text-slate-400 mb-1">ឬដាក់តំណភ្ជាប់ YouTube Embed (ប្រសិនបើមិន Upload MP4)</label>
-                <input type="text" name="videoUrl" placeholder="https://www.youtube.com/embed/..." class="w-full bg-cinema-800 border border-white/10 rounded-xl px-3.5 py-2 text-sm">
             </div>
 
             <button type="submit" id="submitBtn" class="w-full py-3 rounded-xl bg-cinema-accent hover:bg-rose-700 font-bold text-sm transition">
@@ -101,67 +102,137 @@
 
         <!-- Existing Movies List -->
         <div class="bg-cinema-900 p-6 rounded-2xl border border-white/10 space-y-4">
-            <h2 class="text-lg font-bold">បញ្ជីភាពយន្តដែលមានស្រាប់</h2>
+            <h2 class="text-lg font-bold">បញ្ជីភាពយន្តក្នុង Cloud (<span id="cloudCount">0</span>)</h2>
             <div id="adminMoviesList" class="space-y-2"></div>
         </div>
     </div>
 
-    <script>
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+        import { getFirestore, collection, addDoc, getDocs, deleteDoc, doc, orderBy, query, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+
+        // 1. លេខសម្ងាត់ Admin របស់អ្នក
+        const ADMIN_PASSWORD = "nolzz2026";
+
+        // 2. Paste firebaseConfig របស់អ្នកនៅទីនេះ
+        const firebaseConfig = {
+           const firebaseConfig = {
+  apiKey: "AIzaSyB13WHhp3ZqUPufDdzKaTbPckpDE8aGhyE",
+  authDomain: "piphop-ai-movie.firebaseapp.com",
+  projectId: "piphop-ai-movie",
+  storageBucket: "piphop-ai-movie.firebasestorage.app",
+  messagingSenderId: "551359216017",
+  appId: "1:551359216017:web:af22c74192deeda7724230",
+  measurementId: "G-FJ555SFY7H"
+};
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const db = getFirestore(app);
+        const moviesCol = collection(db, "movies");
+
+        function formatDrivePoster(url) {
+            if (!url || !url.includes('drive.google.com')) return url;
+            const match = url.match(/\/d\/([a-zA-Z0-9_-]+)/) || url.match(/[?&]id=([a-zA-Z0-9_-]+)/);
+            return match ? `https://lh3.googleusercontent.com/d/${match[1]}` : url;
+        }
+
         async function loadAdminMovies() {
-            const res = await fetch('/api/movies');
-            const movies = await res.json();
-            document.getElementById('adminMoviesList').innerHTML = movies.map(m => `
-                <div class="flex items-center justify-between bg-cinema-800 p-3 rounded-xl">
-                    <div class="flex items-center gap-3">
-                        <img src="${m.poster}" class="w-10 h-14 object-cover rounded-lg">
-                        <div>
-                            <div class="font-bold text-sm">${m.titleKm}</div>
-                            <div class="text-xs text-slate-400">${m.titleEn} • ${m.category} • ⭐ ${m.rating}</div>
+            const listEl = document.getElementById('adminMoviesList');
+            listEl.innerHTML = '<div class="text-xs text-slate-400">កំពុងទាញទិន្នន័យ...</div>';
+            try {
+                const q = query(moviesCol, orderBy("createdAt", "desc"));
+                const snapshot = await getDocs(q);
+                document.getElementById('cloudCount').textContent = snapshot.size;
+                
+                if (snapshot.empty) {
+                    listEl.innerHTML = '<div class="text-xs text-slate-400">មិនទាន់មានរឿងថ្មីក្នុង Cloud នៅឡើយទេ។</div>';
+                    return;
+                }
+
+                listEl.innerHTML = '';
+                snapshot.forEach(docSnap => {
+                    const m = docSnap.data();
+                    listEl.innerHTML += `
+                        <div class="flex items-center justify-between bg-cinema-800 p-3 rounded-xl">
+                            <div class="flex items-center gap-3">
+                                <img src="${formatDrivePoster(m.poster)}" onerror="this.src='https://placehold.co/80x120/161d2c/e11d48?text=AI'" class="w-10 h-14 object-cover rounded-lg">
+                                <div>
+                                    <div class="font-bold text-sm">${m.titleKm}</div>
+                                    <div class="text-xs text-slate-400">${m.titleEn} • ${m.category} • ⭐ ${m.rating}</div>
+                                </div>
+                            </div>
+                            <button onclick="deleteMovie('${docSnap.id}')" class="px-3 py-1.5 rounded-lg bg-red-600/20 text-red-400 hover:bg-red-600 hover:text-white text-xs font-bold transition">លុប</button>
                         </div>
-                    </div>
-                    <button onclick="deleteMovie(${m.id})" class="px-3 py-1.5 rounded-lg bg-red-600/20 text-red-400 hover:bg-red-600 hover:text-white text-xs font-bold transition">លុប</button>
-                </div>
-            `).join('');
+                    `;
+                });
+            } catch (err) {
+                listEl.innerHTML = `<div class="text-xs text-rose-400">កំហុស Firebase៖ ${err.message}</div>`;
+            }
         }
 
         document.getElementById('uploadForm').addEventListener('submit', async (e) => {
             e.preventDefault();
+            const pass = document.getElementById('adminPass').value;
+            if (pass !== ADMIN_PASSWORD) {
+                alert('លេខសម្ងាត់ Admin មិនត្រឹមត្រូវ!');
+                return;
+            }
+
             const btn = document.getElementById('submitBtn');
             btn.disabled = true;
-            btn.textContent = 'កំពុង Upload... សូមរង់ចាំ...';
+            btn.textContent = 'កំពុងរក្សាទុកទៅ Cloud...';
 
-            const formData = new FormData(e.target);
-            const pass = document.getElementById('adminPass').value;
+            const fd = new FormData(e.target);
+            const titleKm = fd.get('titleKm').trim();
+            const titleEn = fd.get('titleEn').trim();
+            const poster = fd.get('posterUrl').trim();
 
-            const res = await fetch('/api/movies', {
-                method: 'POST',
-                headers: { 'x-admin-password': pass },
-                body: formData
-            });
+            const movieData = {
+                titleKm,
+                titleEn,
+                category: fd.get('category'),
+                duration: fd.get('duration').trim() || '1h 30m',
+                rating: Number(fd.get('rating')) || 9.0,
+                year: Number(fd.get('year')) || 2026,
+                cast: fd.get('cast').trim() || 'Nolzz',
+                synopsis: fd.get('synopsis').trim() || `សាច់រឿងសង្ខេបនៃរឿង ${titleEn}...`,
+                poster: poster,
+                backdrop: poster,
+                video: fd.get('videoUrl').trim(),
+                director: 'Nolzz',
+                featured: false,
+                createdAt: serverTimestamp()
+            };
+
+            try {
+                await addDoc(moviesCol, movieData);
+                alert('បង្ហោះភាពយន្តបានជោគជ័យ!');
+                e.target.reset();
+                document.getElementById('adminPass').value = pass;
+                await loadAdminMovies();
+            } catch (err) {
+                alert('មានបញ្ហា៖ ' + err.message);
+            }
 
             btn.disabled = false;
             btn.textContent = '+ បង្ហោះភាពយន្ត (Upload Movie)';
-
-            if (res.ok) {
-                alert('បង្ហោះភាពយន្តបានជោគជ័យ!');
-                e.target.reset();
-                loadAdminMovies();
-            } else {
-                const err = await res.json();
-                alert(err.error || 'មានបញ្ហាក្នុងការបង្ហោះ!');
-            }
         });
 
-        async function deleteMovie(id) {
-            if (!confirm('តើអ្នកពិតជាចង់លុបភាពយន្តនេះមែនទេ?')) return;
+        window.deleteMovie = async (docId) => {
             const pass = document.getElementById('adminPass').value;
-            const res = await fetch(`/api/movies/${id}`, {
-                method: 'DELETE',
-                headers: { 'x-admin-password': pass }
-            });
-            if (res.ok) loadAdminMovies();
-            else alert('លេខសម្ងាត់មិនត្រឹមត្រូវ!');
-        }
+            if (pass !== ADMIN_PASSWORD) {
+                alert('សូមបញ្ចូលលេខសម្ងាត់ Admin ជាមុនសិន!');
+                return;
+            }
+            if (!confirm('តើអ្នកពិតជាចង់លុបភាពយន្តនេះមែនទេ?')) return;
+            try {
+                await deleteDoc(doc(db, "movies", docId));
+                await loadAdminMovies();
+            } catch (err) {
+                alert('មិនអាចលុបបានទេ៖ ' + err.message);
+            }
+        };
 
         loadAdminMovies();
     </script>
