@@ -489,8 +489,9 @@ function startRealPlayer() {
     const ytEl = document.getElementById('youtubePlayer');
 
     const isIframeEmbed = rawVideoUrl.includes('youtube.com') || 
-                          rawVideoUrl.includes('youtu.be') || 
-                          rawVideoUrl.includes('drive.google.com');
+                      rawVideoUrl.includes('youtu.be') || 
+                      rawVideoUrl.includes('drive.google.com') ||
+                      rawVideoUrl.includes('ok.ru');
 
     if (isIframeEmbed) {
         videoEl.classList.add('hidden');
