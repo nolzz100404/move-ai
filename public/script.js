@@ -494,10 +494,16 @@ function startRealPlayer() {
                       rawVideoUrl.includes('ok.ru');
 
     if (isIframeEmbed) {
+      if (isIframeEmbed) {
         videoEl.classList.add('hidden');
         videoEl.pause();
         videoEl.src = '';
         ytEl.classList.remove('hidden');
+        
+        // អនុញ្ញាតឱ្យទូរស័ព្ទបើក Fullscreen និងលេងវីដេអូខាងក្រៅបាន
+        ytEl.setAttribute('allowfullscreen', 'true');
+        ytEl.setAttribute('allow', 'autoplay; fullscreen; encrypted-media; picture-in-picture');
+        
         const embedUrl = formatVideoEmbedUrl(rawVideoUrl);
         ytEl.src = embedUrl;
 
@@ -507,8 +513,12 @@ function startRealPlayer() {
             extBtn.id = 'externalDriveBtn';
             extBtn.target = '_blank';
             extBtn.className = 'mt-3 inline-flex items-center justify-center gap-2 px-4 py-2 rounded-xl bg-cinema-accent hover:bg-rose-700 text-white text-xs font-bold shadow-lg transition-all';
-            extBtn.innerHTML = '<i class="fa-solid fa-up-right-from-square"></i> បើកមើលពេញអេក្រង់ (បើវីដេអូងងឹតលើទូរស័ព្ទ)';
             playerView.appendChild(extBtn);
+        }
+        extBtn.href = embedUrl;
+        extBtn.innerHTML = '<i class="fa-solid fa-up-right-from-square"></i> បើកមើលពេញអេក្រង់ (បើវីដេអូអត់ចេញលើទូរស័ព្ទ)';
+        extBtn.classList.toggle('hidden', !(rawVideoUrl.includes('drive.google.com') || rawVideoUrl.includes('ok.ru')));
+    }
         }
        extBtn.href = embedUrl;
 extBtn.innerHTML = '<i class="fa-solid fa-up-right-from-square"></i> បើកមើលពេញអេក្រង់ (បើវីដេអូអត់ចេញលើទូរស័ព្ទ)';
