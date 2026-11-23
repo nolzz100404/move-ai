@@ -1,3 +1,5 @@
+const FIREBASE_PROJECT_ID = "piphop-ai-movie";
+
 const CAT_MAP = {
     "Drama": "មនោសញ្ចេតនា",
     "Action": "វាយប្រហារ",
@@ -83,21 +85,59 @@ document.addEventListener('DOMContentLoaded', async () => {
 
 async function loadMoviesFromBackend() {
     try {
-        let data = null;
-        // ព្យាយាមទាញពី API ជាមុន បើបរាជ័យឱ្យទាញពី public/movies.json ផ្ទាល់
+        // ១. ទាញរឿងថ្មីៗពី Firebase Firestore (piphop-ai-movie)
+        let firebaseMovies = [];
+        try {
+            const fbUrl = `https://firestore.googleapis.com/v1/projects/${FIREBASE_PROJECT_ID}/databases/(default)/documents/movies?pageSize=100`;
+            const fbRes = await fetch(fbUrl);
+            if (fbRes.ok) {
+                const fbData = await fbRes.json();
+                if (fbData.documents) {
+                    firebaseMovies = fbData.documents.map((doc, idx) => {
+                        const f = doc.fields;
+                        return {
+                            id: 1000 + idx,
+                            titleKm: f.titleKm?.stringValue || '',
+                            titleEn: f.titleEn?.stringValue || '',
+                            category: f.category?.stringValue || 'Drama',
+                            year: Number(f.year?.integerValue || 2026),
+                            rating: Number(f.rating?.doubleValue || f.rating?.integerValue || 9.0),
+                            duration: f.duration?.stringValue || '1h 30m',
+                            poster: f.poster?.stringValue || '',
+                            backdrop: f.backdrop?.stringValue || f.poster?.stringValue || '',
+                            video: f.video?.stringValue || '',
+                            director: f.director?.stringValue || 'Nolzz',
+                            cast: f.cast?.stringValue || 'Nolzz',
+                            synopsis: f.synopsis?.stringValue || '',
+                            featured: Boolean(f.featured?.booleanValue),
+                            createdAt: f.createdAt?.timestampValue || ''
+                        };
+                    });
+                    // តម្រៀបរឿងដែលទើប Upload ថ្មីបំផុតឱ្យនៅខាងលើគេ
+                    firebaseMovies.sort((a, b) => (b.createdAt > a.createdAt ? 1 : -1));
+                }
+            }
+        } catch (e) {
+            console.warn('Firebase fetch skipped:', e);
+        }
+
+        // ២. ទាញរឿងចាស់ៗពី API ឬ public/movies.json
+        let localMovies = [];
         try {
             const res = await fetch('/api/movies');
-            if (res.ok) data = await res.json();
-        } catch (e) {
-            console.warn('API failed, falling back to /movies.json');
+            if (res.ok) localMovies = await res.json();
+        } catch (e) {}
+
+        if (!localMovies || !Array.isArray(localMovies) || localMovies.length === 0) {
+            try {
+                const fallbackRes = await fetch('/movies.json?v=' + Date.now());
+                if (fallbackRes.ok) localMovies = await fallbackRes.json();
+            } catch (e) {}
         }
 
-        if (!data || !Array.isArray(data)) {
-            const fallbackRes = await fetch('/movies.json?v=' + Date.now());
-            data = await fallbackRes.json();
-        }
+        const combined = [...firebaseMovies, ...(Array.isArray(localMovies) ? localMovies : [])];
 
-        MOVIES_DATA = data.map(m => ({
+        MOVIES_DATA = combined.map(m => ({
             ...m,
             poster: formatPosterUrl(m.poster),
             backdrop: formatPosterUrl(m.backdrop || m.poster),
