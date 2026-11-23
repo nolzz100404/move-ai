@@ -510,8 +510,9 @@ function startRealPlayer() {
             extBtn.innerHTML = '<i class="fa-solid fa-up-right-from-square"></i> បើកមើលពេញអេក្រង់ (បើវីដេអូងងឹតលើទូរស័ព្ទ)';
             playerView.appendChild(extBtn);
         }
-        extBtn.href = embedUrl;
-        extBtn.classList.toggle('hidden', !rawVideoUrl.includes('drive.google.com'));
+       extBtn.href = embedUrl;
+extBtn.innerHTML = '<i class="fa-solid fa-up-right-from-square"></i> បើកមើលពេញអេក្រង់ (បើវីដេអូអត់ចេញលើទូរស័ព្ទ)';
+extBtn.classList.toggle('hidden', !(rawVideoUrl.includes('drive.google.com') || rawVideoUrl.includes('ok.ru')));
     } else {
         ytEl.classList.add('hidden');
         ytEl.src = '';
